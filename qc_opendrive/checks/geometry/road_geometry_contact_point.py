@@ -103,9 +103,14 @@ def _check_junctions_connection_lane_follow_direction(
         if utils.to_int(road.get("junction")) == 1:
             continue
 
-        road_start = (road.find("link").find("predecessor"),
+        road_link = road.find("link")
+        # <link> is optional (minOccurs="0"); an isolated road may omit it.
+        if road_link is None:
+            continue
+
+        road_start = (road_link.find("predecessor"),
                       utils.get_start_point_xyz_from_road_reference_line(road))
-        road_end = (road.find("link").find("successor"),
+        road_end = (road_link.find("successor"),
                     utils.get_end_point_xyz_from_road_reference_line(road))
 
         for road_side in (road_start, road_end):
