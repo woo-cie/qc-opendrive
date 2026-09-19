@@ -29,7 +29,7 @@ pydantic-xml = "^2.11.0"
 type = "git"
 url = "https://github.com/woo-cie/qc-baselib-py.git"
 reference = "perf/issue-lookup-and-validation"
-resolved_reference = "3c8b95ea91fd17de28a3225d4dc09def24c57cc8"
+resolved_reference = "4431d5cf161dc579c77d2c39ebcd71e26c3bc12e"
 
 [[package]]
 name = "black"
