@@ -92,7 +92,7 @@ def _xcessor_contact_point_has_issue(
     return None
 
 
-def _check_junctions_connection_lane_follow_direction(
+def _check_road_geometry_contact_point(
         checker_data: models.CheckerData,
 ) -> None:
     roads = utils.get_roads(checker_data.input_file_xml_root)
@@ -131,4 +131,4 @@ def check_rule(checker_data: models.CheckerData) -> None:
         the issue description message.
     """
     logging.info("Executing road.geometry.contact_point check")
-    _check_junctions_connection_lane_follow_direction(checker_data)
+    _check_road_geometry_contact_point(checker_data)
