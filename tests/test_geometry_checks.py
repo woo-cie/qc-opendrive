@@ -231,6 +231,11 @@ def test_road_geometry_param_poly3_normalized_range(
             [],
         ),
         (
+            "valid_unevaluable_geometry",
+            0,
+            [],
+        ),
+        (
             "invalid",
             2,
             [

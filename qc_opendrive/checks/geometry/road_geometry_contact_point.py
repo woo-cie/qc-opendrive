@@ -60,10 +60,15 @@ def _raise_issue(
 
 def _xcessor_contact_point_has_issue(
         xcessor: etree._Element,
-        road_contact_point_xyz: models.Point3D,
+        road_contact_point_xyz: Optional[models.Point3D],
         road_id_map: dict
 ) -> Optional[models.Point3D]:
     if xcessor is None:
+        return None
+
+    # the road's own reference line point is unavailable when its geometry
+    # cannot be evaluated; there is nothing to compare against then.
+    if road_contact_point_xyz is None:
         return None
 
     if xcessor.get("elementType") == "junction":
@@ -109,12 +114,18 @@ def _check_junctions_connection_lane_follow_direction(
             continue
 
         road_start = (road_link.find("predecessor"),
-                      utils.get_start_point_xyz_from_road_reference_line(road))
+                      utils.get_start_point_xyz_from_road_reference_line)
         road_end = (road_link.find("successor"),
-                    utils.get_end_point_xyz_from_road_reference_line(road))
+                    utils.get_end_point_xyz_from_road_reference_line)
 
-        for road_side in (road_start, road_end):
-            xcessor_contact_point_xyz_with_issue = _xcessor_contact_point_has_issue(*road_side, road_id_map)
+        for xcessor, get_road_contact_point_xyz in (road_start, road_end):
+            # <predecessor> and <successor> are optional as well; evaluating the
+            # reference line is pointless when there is nothing to compare against.
+            if xcessor is None:
+                continue
+
+            xcessor_contact_point_xyz_with_issue = _xcessor_contact_point_has_issue(
+                xcessor, get_road_contact_point_xyz(road), road_id_map)
             if xcessor_contact_point_xyz_with_issue is not None:
                 _raise_issue(checker_data, road, xcessor_contact_point_xyz_with_issue)
 
