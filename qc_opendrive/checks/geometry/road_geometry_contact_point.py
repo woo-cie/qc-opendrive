@@ -99,8 +99,8 @@ def _check_junctions_connection_lane_follow_direction(
     road_id_map = utils.get_road_id_map(checker_data.input_file_xml_root)
 
     for road in roads:
-        # if it is a junction, rule does not apply
-        if utils.to_int(road.get("junction")) == 1:
+        # the rule does not apply to roads that belong to a junction
+        if utils.road_belongs_to_junction(road):
             continue
 
         road_start = (road.find("link").find("predecessor"),
