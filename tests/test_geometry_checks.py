@@ -256,6 +256,16 @@ def test_road_geometry_param_poly3_normalized_range(
             0,
             [],
         ),
+        # The same junction plus a pair of directly connected roads whose successor
+        # contact point is wrong: the junction roads stay skipped while the road
+        # that does not belong to a junction is still reported.
+        (
+            "invalid_junction_and_road",
+            1,
+            [
+                "/OpenDRIVE/road[7]",
+            ],
+        ),
     ],
 )
 def test_road_geometry_contact_point(
