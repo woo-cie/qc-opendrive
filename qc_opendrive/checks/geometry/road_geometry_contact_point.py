@@ -16,9 +16,7 @@ from qc_opendrive import constants
 from qc_opendrive.base import models, utils
 
 CHECKER_ID = "check_asam_xodr_road_geometry_contact_point"
-CHECKER_DESCRIPTION = (
-    "If two roads are connected without a junction, the road reference line of a new road shall always begin at the <contactPoint> element of its successor or predecessor road. The road reference lines may be directed in opposite directions."
-)
+CHECKER_DESCRIPTION = "If two roads are connected without a junction, the road reference line of a new road shall always begin at the <contactPoint> element of its successor or predecessor road. The road reference lines may be directed in opposite directions."
 CHECKER_PRECONDITIONS = basic_preconditions.CHECKER_PRECONDITIONS
 RULE_UID = "asam.net:xodr:1.7.0:road.geometry.contact_point"
 
@@ -27,9 +25,9 @@ FLOAT_COMPARISON_THRESHOLD = 1e-6
 
 
 def _raise_issue(
-        checker_data: models.CheckerData,
-        road: etree._ElementTree,
-        contact_point: models.Point3D,
+    checker_data: models.CheckerData,
+    road: etree._ElementTree,
+    contact_point: models.Point3D,
 ):
     issue_id = checker_data.result.register_issue(
         checker_bundle_name=constants.BUNDLE_NAME,
@@ -59,9 +57,9 @@ def _raise_issue(
 
 
 def _xcessor_contact_point_has_issue(
-        xcessor: etree._Element,
-        road_contact_point_xyz: Optional[models.Point3D],
-        road_id_map: dict
+    xcessor: etree._Element,
+    road_contact_point_xyz: Optional[models.Point3D],
+    road_id_map: dict,
 ) -> Optional[models.Point3D]:
     if xcessor is None:
         return None
@@ -82,15 +80,20 @@ def _xcessor_contact_point_has_issue(
     if contact_point is None:
         return None
 
-    xcessor_contact_point_xyz = utils.get_point_xyz_from_contact_point(xcessor_road, contact_point)
+    xcessor_contact_point_xyz = utils.get_point_xyz_from_contact_point(
+        xcessor_road, contact_point
+    )
     if xcessor_contact_point_xyz is None:
         return None
 
     # allow error in the order of 1e-6 for floating point comparison of coordinates
     if any(
-            abs(getattr(road_contact_point_xyz, attr) - getattr(xcessor_contact_point_xyz, attr))
-            >= FLOAT_COMPARISON_THRESHOLD
-            for attr in ("x", "y", "z")
+        abs(
+            getattr(road_contact_point_xyz, attr)
+            - getattr(xcessor_contact_point_xyz, attr)
+        )
+        >= FLOAT_COMPARISON_THRESHOLD
+        for attr in ("x", "y", "z")
     ):
         return xcessor_contact_point_xyz
 
@@ -98,7 +101,7 @@ def _xcessor_contact_point_has_issue(
 
 
 def _check_junctions_connection_lane_follow_direction(
-        checker_data: models.CheckerData,
+    checker_data: models.CheckerData,
 ) -> None:
     roads = utils.get_roads(checker_data.input_file_xml_root)
     road_id_map = utils.get_road_id_map(checker_data.input_file_xml_root)
@@ -113,10 +116,14 @@ def _check_junctions_connection_lane_follow_direction(
         if road_link is None:
             continue
 
-        road_start = (road_link.find("predecessor"),
-                      utils.get_start_point_xyz_from_road_reference_line)
-        road_end = (road_link.find("successor"),
-                    utils.get_end_point_xyz_from_road_reference_line)
+        road_start = (
+            road_link.find("predecessor"),
+            utils.get_start_point_xyz_from_road_reference_line,
+        )
+        road_end = (
+            road_link.find("successor"),
+            utils.get_end_point_xyz_from_road_reference_line,
+        )
 
         for xcessor, get_road_contact_point_xyz in (road_start, road_end):
             # <predecessor> and <successor> are optional as well; evaluating the
@@ -125,7 +132,8 @@ def _check_junctions_connection_lane_follow_direction(
                 continue
 
             xcessor_contact_point_xyz_with_issue = _xcessor_contact_point_has_issue(
-                xcessor, get_road_contact_point_xyz(road), road_id_map)
+                xcessor, get_road_contact_point_xyz(road), road_id_map
+            )
             if xcessor_contact_point_xyz_with_issue is not None:
                 _raise_issue(checker_data, road, xcessor_contact_point_xyz_with_issue)
 
