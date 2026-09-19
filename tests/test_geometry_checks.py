@@ -249,6 +249,13 @@ def test_road_geometry_param_poly3_normalized_range(
             0,
             [],
         ),
+        # The same junction with a non-numeric junction id, which road@junction
+        # allows since it is an xs:string.
+        (
+            "valid_junction_road_string_id",
+            0,
+            [],
+        ),
     ],
 )
 def test_road_geometry_contact_point(
